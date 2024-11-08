@@ -12,4 +12,4 @@ Aplicación desarrollada en Python para gestionar las actividades, alumnos, inst
 1. Clona este repositorio:
 
    ```bash
-   git clone https://github.com/tu_usuario/tu_proyecto.git
+   git clone https://github.com/JuanOttonelli/obligatorioBDD.git
