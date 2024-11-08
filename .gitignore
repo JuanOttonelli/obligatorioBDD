@@ -1,0 +1,7 @@
+Archivo para especificar qué archivos o directorios deben ser ignorados por Git.
+
+```plaintext
+__pycache__/
+*.pyc
+.venv
+.envSql
