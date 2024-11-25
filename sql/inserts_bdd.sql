@@ -1,3 +1,8 @@
+
+INSERT INTO `tipospersonas` VALUES (1,'Administrativo'),(2,'Instructor'),(3,'Estudiante');
+
+INSERT INTO `turnos` VALUES (1,'09:00:00','11:00:00','Mañana'),(2,'12:00:00','14:00:00','Tarde'),(3,'16:00:00','18:00:00','Noche');
+
 -- Inserción de actividades
 INSERT INTO actividades (descripcion, costo, restriccion_edad)
 VALUES
@@ -73,3 +78,10 @@ VALUES
 
 INSERT INTO login   (correo, contraseña_hash, tipo_persona, ci_persona) VALUE
 ('admin@admin.com','$2b$12$yzGGvmmB4H56y/iY9.Kg4.6yP0hVKe7nn9ajvtqnV1acUBY.vjOs6',1,'00000000');
+
+INSERT INTO `alquileres` VALUES (1,'77777777',1,1),(2,'77777777',1,3),(3,'77777777',1,1),(4,'77777777',1,3),(5,'77777777',1,1),(6,'77777777',1,3),(7,'77777777',1,1),(8,'77777777',1,3),(9,'77777777',3,5),(10,'10000002',3,4),(11,'10000002',3,6),(12,'10000003',3,6),(13,'10000005',4,7),(14,'10000005',4,8);
+
+INSERT INTO `alumno_clase` VALUES (1,'77777777',NULL),(3,'10000002',NULL),(3,'10000003',NULL),(3,'77777777',NULL),(4,'10000001',NULL),(4,'10000002',NULL),(4,'10000003',NULL),(4,'10000005',NULL);
+
+INSERT INTO `clase` VALUES (1,'52923401',1,1,1),(3,'52923401',2,3,0),(4,'20000002',3,2,0),(5,'20000002',1,1,0);
+
