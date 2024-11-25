@@ -74,3 +74,22 @@ def eliminar_actividad(id_actividad):
         cursor.close()
         conexion.close()
     return exito
+
+def obtener_actividad_por_id(id_actividad):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    query = "SELECT * FROM actividades WHERE id = %s"
+    cursor.execute(query, (id_actividad,))
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    if resultado:
+        actividad = Actividad(
+            id=resultado['id'],
+            descripcion=resultado['descripcion'],
+            costo=resultado['costo'],
+            restriccion_edad=resultado['restriccion_edad']
+        )
+        return actividad
+    else:
+        return None

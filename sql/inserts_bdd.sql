@@ -70,3 +70,6 @@ VALUES
 ('roberto.suarez@example.com', '$2b$12$F6iJRTqQYFFi/6NvbG6L6O87hS7hfMILtlTtgFIAc2YXlxAWYw4Se', 2, '20000003'),
 ('andrea.romero@example.com', '$2b$12$F6iJRTqQYFFi/6NvbG6L6O87hS7hfMILtlTtgFIAc2YXlxAWYw4Se', 2, '20000004'),
 ('fernando.vargas@example.com', '$2b$12$F6iJRTqQYFFi/6NvbG6L6O87hS7hfMILtlTtgFIAc2YXlxAWYw4Se', 2, '20000005');
+
+INSERT INTO login   (correo, contraseña_hash, tipo_persona, ci_persona) VALUE
+('admin@admin.com','$2b$12$yzGGvmmB4H56y/iY9.Kg4.6yP0hVKe7nn9ajvtqnV1acUBY.vjOs6',1,'00000000');

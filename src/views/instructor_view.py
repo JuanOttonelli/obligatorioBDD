@@ -1,10 +1,18 @@
 # src/views/instructor_view.py
 
 import tkinter as tk
-from tkinter import messagebox
-from src.controllers.instructor_controller import obtener_instructores, agregar_instructor, actualizar_instructor, eliminar_instructor, obtener_agenda_instructor
+from tkinter import messagebox, ttk
+from src.controllers.instructor_controller import (
+    obtener_instructores,
+    agregar_instructor,
+    actualizar_instructor,
+    eliminar_instructor,
+    obtener_agenda_instructor,
+    obtener_instructor_por_ci,
+)
 from src.models.instructor import Instructor
-from src.controllers.instructor_controller import agregar_instructor
+from src.views.main_menu_view import MainMenuView
+
 
 class InstructorView:
     def __init__(self, master):
@@ -13,23 +21,72 @@ class InstructorView:
         self.frame = tk.Frame(master)
         self.frame.pack(padx=20, pady=20)
 
-        tk.Label(self.frame, text="Gestión de Instructores", font=("Helvetica", 16)).pack(pady=10)
+        tk.Label(self.frame, text="Gestión de Instructores", font=("Helvetica", 16)).grid(
+            row=0, column=0, columnspan=4, pady=10
+        )
 
-        tk.Button(self.frame, text="Listar Instructores", command=self.listar_instructores, width=20).pack(pady=5)
-        tk.Button(self.frame, text="Agregar Instructor", command=self.abrir_formulario_agregar, width=20).pack(pady=5)
-        tk.Button(self.frame, text="Actualizar Instructor", command=self.abrir_formulario_actualizar, width=20).pack(pady=5)
-        tk.Button(self.frame, text="Eliminar Instructor", command=self.eliminar_instructor, width=20).pack(pady=5)
-        tk.Button(self.frame, text="Ver Agenda Instructor", command=self.ver_agenda_instructor, width=20).pack(pady=5)
-        tk.Button(self.frame, text="Volver", command=self.volver, width=20).pack(pady=10)
+        # Tabla de instructores
+        self.tree = ttk.Treeview(
+            self.frame,
+            columns=("CI", "Nombre", "Apellido", "Correo Electrónico"),
+            show="headings",
+        )
+        self.tree.heading("CI", text="CI")
+        self.tree.heading("Nombre", text="Nombre")
+        self.tree.heading("Apellido", text="Apellido")
+        self.tree.heading("Correo Electrónico", text="Correo Electrónico")
 
-    def listar_instructores(self):
+        self.tree.column("CI", width=100)
+        self.tree.column("Nombre", width=100)
+        self.tree.column("Apellido", width=100)
+        self.tree.column("Correo Electrónico", width=200)
+
+        self.tree.grid(row=1, column=0, columnspan=4, pady=10)
+
+        # Botones
+        tk.Button(
+            self.frame, text="Agregar", command=self.abrir_formulario_agregar, width=15
+        ).grid(row=2, column=0, padx=5, pady=5)
+        tk.Button(
+            self.frame,
+            text="Actualizar",
+            command=self.abrir_formulario_actualizar,
+            width=15,
+        ).grid(row=2, column=1, padx=5, pady=5)
+        tk.Button(
+            self.frame, text="Eliminar", command=self.eliminar_instructor, width=15
+        ).grid(row=2, column=2, padx=5, pady=5)
+        tk.Button(
+            self.frame,
+            text="Ver Agenda",
+            command=self.ver_agenda_instructor,
+            width=15,
+        ).grid(row=2, column=3, padx=5, pady=5)
+        tk.Button(self.frame, text="Volver", command=self.volver, width=15).grid(
+            row=3, column=0, columnspan=4, pady=10
+        )
+
+        # Cargar instructores
+        self.cargar_instructores()
+
+    def cargar_instructores(self):
+        # Limpiar la tabla
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        # Obtener los instructores y cargarlos en la tabla
         instructores = obtener_instructores()
-        ventana = tk.Toplevel(self.master)
-        ventana.title("Lista de Instructores")
-        text = tk.Text(ventana, width=80, height=20)
-        text.pack()
         for instructor in instructores:
-            text.insert(tk.END, f"CI: {instructor.ci}, Nombre: {instructor.nombre} {instructor.apellido}\n")
+            self.tree.insert(
+                "",
+                "end",
+                values=(
+                    instructor.ci,
+                    instructor.nombre,
+                    instructor.apellido,
+                    instructor.correo_electronico,
+                ),
+            )
 
     def abrir_formulario_agregar(self):
         ventana = tk.Toplevel(self.master)
@@ -39,136 +96,193 @@ class InstructorView:
         entries = []
 
         for idx, label_text in enumerate(labels):
-            tk.Label(ventana, text=label_text + ":").grid(row=idx, column=0, sticky=tk.E)
+            tk.Label(ventana, text=label_text + ":").grid(
+                row=idx, column=0, sticky=tk.E, padx=5, pady=5
+            )
             entry = tk.Entry(ventana)
-            entry.grid(row=idx, column=1)
+            entry.grid(row=idx, column=1, padx=5, pady=5)
             entries.append(entry)
 
         def guardar_instructor():
             datos = [entry.get() for entry in entries]
             if "" in datos:
-                messagebox.showwarning("Advertencia", "Todos los campos son obligatorios.")
+                messagebox.showwarning(
+                    "Advertencia", "Todos los campos son obligatorios.", parent=ventana
+                )
                 return
-            instructor = Instructor(*datos)
+            instructor = Instructor(
+                ci=datos[0],
+                nombre=datos[1],
+                apellido=datos[2],
+                correo_electronico=datos[3],
+            )
 
             exito, contraseña = agregar_instructor(instructor)
             if exito:
-                messagebox.showinfo("Éxito", f"Instructor agregado correctamente.\nContraseña generada: {contraseña}")
+                messagebox.showinfo(
+                    "Éxito",
+                    f"Instructor agregado correctamente.\nContraseña generada: {contraseña}",
+                    parent=ventana,
+                )
                 ventana.destroy()
+                self.cargar_instructores()
             else:
-                messagebox.showerror("Error", "No se pudo agregar el instructor.")
-        tk.Button(ventana, text="Guardar", command=guardar_instructor).grid(row=len(labels), column=0, columnspan=2, pady=10)
+                messagebox.showerror(
+                    "Error", "No se pudo agregar el instructor.", parent=ventana
+                )
+
+        tk.Button(ventana, text="Guardar", command=guardar_instructor).grid(
+            row=len(labels), column=0, columnspan=2, pady=10
+        )
 
     def abrir_formulario_actualizar(self):
+        seleccion = self.tree.selection()
+        if not seleccion:
+            messagebox.showwarning(
+                "Advertencia", "Debe seleccionar un instructor para actualizar."
+            )
+            return
+
+        item = self.tree.item(seleccion)
+        instructor_ci = item["values"][0]
+
         ventana = tk.Toplevel(self.master)
         ventana.title("Actualizar Instructor")
 
-        tk.Label(ventana, text="CI del Instructor a actualizar:").grid(row=0, column=0)
-        entry_ci = tk.Entry(ventana)
-        entry_ci.grid(row=0, column=1)
+        labels = ["Nombre", "Apellido", "Correo Electrónico"]
+        entries = []
 
-        def cargar_datos():
-            ci_instructor = entry_ci.get()
-            if not ci_instructor:
-                messagebox.showwarning("Advertencia", "Debe ingresar el CI del instructor.")
+        for idx, label_text in enumerate(labels):
+            tk.Label(ventana, text=label_text + ":").grid(
+                row=idx, column=0, sticky=tk.E, padx=5, pady=5
+            )
+            entry = tk.Entry(ventana)
+            entry.grid(row=idx, column=1, padx=5, pady=5)
+            entries.append(entry)
+
+        # Cargar datos actuales
+        instructor = obtener_instructor_por_ci(instructor_ci)
+        if instructor:
+            entries[0].insert(0, instructor.nombre)
+            entries[1].insert(0, instructor.apellido)
+            entries[2].insert(0, instructor.correo_electronico)
+        else:
+            messagebox.showerror(
+                "Error",
+                "No se pudo obtener la información del instructor.",
+                parent=ventana,
+            )
+            ventana.destroy()
+            return
+
+        def actualizar_instructor_bd():
+            datos = [entry.get() for entry in entries]
+            if "" in datos:
+                messagebox.showwarning(
+                    "Advertencia", "Todos los campos son obligatorios.", parent=ventana
+                )
                 return
 
-            instructores = obtener_instructores()
-            instructor_encontrado = None
-            for instructor in instructores:
-                if instructor.ci == ci_instructor:
-                    instructor_encontrado = instructor
-                    break
-            if instructor_encontrado is None:
-                messagebox.showerror("Error", "Instructor no encontrado.")
-                return
+            instructor_actualizado = Instructor(
+                ci=instructor_ci,
+                nombre=datos[0],
+                apellido=datos[1],
+                correo_electronico=datos[2],
+            )
+            exito = actualizar_instructor(instructor_actualizado)
+            if exito:
+                messagebox.showinfo(
+                    "Éxito", "Instructor actualizado correctamente.", parent=ventana
+                )
+                ventana.destroy()
+                self.cargar_instructores()
+            else:
+                messagebox.showerror(
+                    "Error", "No se pudo actualizar el instructor.", parent=ventana
+                )
 
-            labels = ["Nombre", "Apellido"]
-            entries = []
-
-            for idx, label_text in enumerate(labels):
-                tk.Label(ventana, text=label_text + ":").grid(row=idx+1, column=0, sticky=tk.E)
-                entry = tk.Entry(ventana)
-                entry.grid(row=idx+1, column=1)
-                entries.append(entry)
-
-            entries[0].insert(0, instructor_encontrado.nombre)
-            entries[1].insert(0, instructor_encontrado.apellido)
-
-            def actualizar_instructor_bd():
-                nombre = entries[0].get()
-                apellido = entries[1].get()
-
-                if not nombre or not apellido:
-                    messagebox.showwarning("Advertencia", "Todos los campos son obligatorios.")
-                    return
-
-                instructor_actualizado = Instructor(ci=ci_instructor, nombre=nombre, apellido=apellido)
-                exito = actualizar_instructor(instructor_actualizado)
-                if exito:
-                    messagebox.showinfo("Éxito", "Instructor actualizado correctamente.")
-                    ventana.destroy()
-                else:
-                    messagebox.showerror("Error", "No se pudo actualizar el instructor.")
-
-            tk.Button(ventana, text="Actualizar", command=actualizar_instructor_bd).grid(row=3, column=0, columnspan=2, pady=10)
-
-        tk.Button(ventana, text="Cargar Datos", command=cargar_datos).grid(row=0, column=2, padx=5)
+        tk.Button(ventana, text="Actualizar", command=actualizar_instructor_bd).grid(
+            row=len(labels), column=0, columnspan=2, pady=10
+        )
 
     def eliminar_instructor(self):
-        ventana = tk.Toplevel(self.master)
-        ventana.title("Eliminar Instructor")
+        seleccion = self.tree.selection()
+        if not seleccion:
+            messagebox.showwarning(
+                "Advertencia", "Debe seleccionar un instructor para eliminar."
+            )
+            return
 
-        tk.Label(ventana, text="CI del Instructor a eliminar:").grid(row=0, column=0)
-        entry_ci = tk.Entry(ventana)
-        entry_ci.grid(row=0, column=1)
+        item = self.tree.item(seleccion)
+        instructor_ci = item["values"][0]
 
-        def confirmar_eliminacion():
-            ci_instructor = entry_ci.get()
-            if not ci_instructor:
-                messagebox.showwarning("Advertencia", "Debe ingresar el CI del instructor.")
-                return
-
-            confirmacion = messagebox.askyesno("Confirmación", "¿Está seguro de que desea eliminar este instructor?")
-            if confirmacion:
-                exito = eliminar_instructor(ci_instructor)
-                if exito:
-                    messagebox.showinfo("Éxito", "Instructor eliminado correctamente.")
-                    ventana.destroy()
-                else:
-                    messagebox.showerror("Error", "No se pudo eliminar el instructor.")
-
-        tk.Button(ventana, text="Eliminar", command=confirmar_eliminacion).grid(row=1, column=0, columnspan=2, pady=10)
+        confirmacion = messagebox.askyesno(
+            "Confirmación",
+            f"¿Está seguro de que desea eliminar al instructor con CI {instructor_ci}?",
+        )
+        if confirmacion:
+            exito = eliminar_instructor(instructor_ci)
+            if exito:
+                messagebox.showinfo("Éxito", "Instructor eliminado correctamente.")
+                self.cargar_instructores()
+            else:
+                messagebox.showerror(
+                    "Error", "No se pudo eliminar el instructor.\nPuede que tenga clases asignadas."
+                )
 
     def ver_agenda_instructor(self):
-        ventana = tk.Toplevel(self.master)
-        ventana.title("Ver Agenda del Instructor")
+        seleccion = self.tree.selection()
+        if not seleccion:
+            messagebox.showwarning(
+                "Advertencia", "Debe seleccionar un instructor para ver su agenda."
+            )
+            return
 
-        tk.Label(ventana, text="CI del Instructor:").grid(row=0, column=0)
-        entry_ci = tk.Entry(ventana)
-        entry_ci.grid(row=0, column=1)
+        item = self.tree.item(seleccion)
+        instructor_ci = item["values"][0]
 
-        def mostrar_agenda():
-            ci_instructor = entry_ci.get()
-            if not ci_instructor:
-                messagebox.showwarning("Advertencia", "Debe ingresar el CI del instructor.")
-                return
+        agenda = obtener_agenda_instructor(instructor_ci)
+        if not agenda:
+            messagebox.showinfo(
+                "Información", "No se encontraron clases para este instructor."
+            )
+            return
 
-            agenda = obtener_agenda_instructor(ci_instructor)
-            if not agenda:
-                messagebox.showinfo("Información", "No se encontraron clases para este instructor.")
-                return
+        ventana_agenda = tk.Toplevel(self.master)
+        ventana_agenda.title(f"Agenda del Instructor {instructor_ci}")
 
-            ventana_agenda = tk.Toplevel(self.master)
-            ventana_agenda.title(f"Agenda del Instructor {ci_instructor}")
-            text = tk.Text(ventana_agenda, width=80, height=20)
-            text.pack()
-            for clase in agenda:
-                text.insert(tk.END, f"ID Clase: {clase['id']}, Actividad: {clase['actividad']}, Hora Inicio: {clase['hora_inicio']}, Hora Fin: {clase['hora_fin']}\n")
+        tree_agenda = ttk.Treeview(
+            ventana_agenda,
+            columns=("ID Clase", "Actividad", "Turno", "Hora Inicio", "Hora Fin"),
+            show="headings",
+        )
+        tree_agenda.heading("ID Clase", text="ID Clase")
+        tree_agenda.heading("Actividad", text="Actividad")
+        tree_agenda.heading("Turno", text="Turno")
+        tree_agenda.heading("Hora Inicio", text="Hora Inicio")
+        tree_agenda.heading("Hora Fin", text="Hora Fin")
 
-        tk.Button(ventana, text="Mostrar Agenda", command=mostrar_agenda).grid(row=0, column=2, padx=5)
+        tree_agenda.column("ID Clase", width=80)
+        tree_agenda.column("Actividad", width=150)
+        tree_agenda.column("Turno", width=100)
+        tree_agenda.column("Hora Inicio", width=100)
+        tree_agenda.column("Hora Fin", width=100)
+
+        tree_agenda.pack(padx=10, pady=10)
+
+        for clase in agenda:
+            tree_agenda.insert(
+                "",
+                "end",
+                values=(
+                    clase["id"],
+                    clase["actividad"],
+                    clase["turno"],
+                    clase["hora_inicio"],
+                    clase["hora_fin"],
+                ),
+            )
 
     def volver(self):
         self.frame.destroy()
-        from src.views.main_menu_view import MainMenuView
         MainMenuView(self.master)
