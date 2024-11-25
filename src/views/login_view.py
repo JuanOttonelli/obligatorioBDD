@@ -1,8 +1,9 @@
-# login_view.py
+# src/views/login_view.py
+
 import tkinter as tk
 from tkinter import messagebox
 from src.controllers.login_controller import verificar_credenciales
-from src.views.main_menu_view import MainMenuView
+from src.views import session  # Importamos el módulo session
 
 class LoginView:
     def __init__(self, master):
@@ -25,9 +26,14 @@ class LoginView:
         contraseña = self.entry_contraseña.get()
         resultado = verificar_credenciales(correo, contraseña)
         if resultado['autenticado']:
-            # Inicio de sesión exitoso
+            # Actualizamos usuario_actual a través del módulo session
+            session.usuario_actual = {
+                'correo': correo,
+                'tipo_persona': resultado['tipo_persona'],
+                'ci_persona': resultado['ci_persona']
+            }
             self.frame.destroy()
+            from src.views.main_menu_view import MainMenuView
             MainMenuView(self.master)
         else:
-            # Mostrar mensaje genérico de error
             messagebox.showerror("Error", "Correo o contraseña incorrectos.")

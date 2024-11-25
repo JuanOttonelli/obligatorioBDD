@@ -1,9 +1,15 @@
 # alumno_view.py
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
+
+from src.controllers import clase_controller, equipo_alquiler_controller, alquiler_controller
 from src.controllers.alumno_controller import obtener_alumnos, agregar_alumno, eliminar_alumno
 from src.models.alumno import Alumno
 from src.controllers.alumno_controller import agregar_alumno
+from src.views import session
+from src.models.alquiler import Alquiler
+
+
 
 class AlumnoView:
     def __init__(self, master):
@@ -74,6 +80,7 @@ class AlumnoView:
             ventana.destroy()
 
         tk.Button(ventana, text="Eliminar", command=confirmar_eliminacion).grid(row=1, column=0, columnspan=2, pady=10)
+
 
     def volver(self):
         self.frame.destroy()

@@ -12,10 +12,10 @@ def verificar_credenciales(correo, contraseña):
     resultado = cursor.fetchone()
     cursor.close()
     conexion.close()
-
     if resultado:
         # Verificar la contraseña utilizando la función verificar_contraseña
         if verificar_contraseña(contraseña, resultado['contraseña_hash']):
+
             return {
                 'autenticado': True,
                 'tipo_persona': resultado['tipo_persona'],

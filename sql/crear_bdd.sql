@@ -1,4 +1,5 @@
 -- Crear la base de datos
+DROP DATABASE escuela_deportes_nieve;
 CREATE DATABASE IF NOT EXISTS escuela_deportes_nieve;
 USE escuela_deportes_nieve;
 
@@ -104,3 +105,19 @@ ALTER TABLE login CHANGE contraseña contraseña_hash VARCHAR(255) NOT NULL;
 UPDATE login SET contraseña_hash = '$2b$12$F6iJRTqQYFFi/6NvbG6L6O87hS7hfMILtlTtgFIAc2YXlxAWYw4Se' WHERE correo = 'juan@gmail.com';
 
 ALTER TABLE instructores ADD COLUMN correo_electronico VARCHAR(255) NOT NULL;
+
+Insert Into login(correo, contraseña_hash, tipo_persona, ci_persona) VALUE (
+    "admin@admin.com","$2b$12$yzGGvmmB4H56y/iY9.Kg4.6yP0hVKe7nn9ajvtqnV1acUBY.vjOs6",1,"99999999"
+    );
+
+ALTER TABLE turnos ADD COLUMN descripcion VARCHAR(255) NOT NULL;
+
+CREATE TABLE IF NOT EXISTS alquileres (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    alumno_ci VARCHAR(20) NOT NULL,
+    clase_id INT NOT NULL,
+    equipo_id_alquiler INT NOT NULL,
+    FOREIGN KEY (alumno_ci) REFERENCES estudiantes(ci),
+    FOREIGN KEY (clase_id) REFERENCES clase(id),
+    FOREIGN KEY (equipo_id_alquiler) REFERENCES equiposDeAlquiler(id)
+);
