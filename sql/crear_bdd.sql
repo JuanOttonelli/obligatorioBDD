@@ -1,76 +1,90 @@
-# src/controllers/actividad_controller.py
+-- Crear la base de datos
+CREATE DATABASE IF NOT EXISTS escuela_deportes_nieve;
+USE escuela_deportes_nieve;
 
-from src.database import obtener_conexion
-from src.models.actividad import Actividad
+-- Tabla tiposPersonas
+CREATE TABLE tiposPersonas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(50) NOT NULL
+);
 
-def obtener_actividades():
-    conexion = obtener_conexion()
-    cursor = conexion.cursor(dictionary=True)
-    query = "SELECT * FROM actividades"
-    cursor.execute(query)
-    resultados = cursor.fetchall()
-    actividades = [Actividad(**row) for row in resultados]
-    cursor.close()
-    conexion.close()
-    return actividades
+-- Tabla login
+CREATE TABLE login (
+    correo VARCHAR(100) PRIMARY KEY,
+    contraseña VARCHAR(255) NOT NULL,
+    tipo_persona INT NOT NULL,
+    ci_persona VARCHAR(20) NOT NULL,
+    FOREIGN KEY (tipo_persona) REFERENCES tiposPersonas(id)
+);
 
-def agregar_actividad(actividad):
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    query = """
-    INSERT INTO actividades (descripcion, costo, restriccion_edad)
-    VALUES (%s, %s, %s)
-    """
-    valores = (actividad.descripcion, actividad.costo, actividad.restriccion_edad)
-    try:
-        cursor.execute(query, valores)
-        conexion.commit()
-        actividad.id = cursor.lastrowid  # Obtener el ID de la actividad recién insertada
-        exito = True
-    except Exception as err:
-        print(f"Error al agregar actividad: {err}")
-        conexion.rollback()
-        exito = False
-    finally:
-        cursor.close()
-        conexion.close()
-    return exito
+-- Tabla actividades
+CREATE TABLE actividades (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(100) NOT NULL,
+    costo DECIMAL(10,2) NOT NULL,
+    restriccion_edad INT NOT NULL
+);
 
-def actualizar_actividad(actividad):
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    query = """
-    UPDATE actividades
-    SET descripcion = %s, costo = %s, restriccion_edad = %s
-    WHERE id = %s
-    """
-    valores = (actividad.descripcion, actividad.costo, actividad.restriccion_edad, actividad.id)
-    try:
-        cursor.execute(query, valores)
-        conexion.commit()
-        exito = True
-    except Exception as err:
-        print(f"Error al actualizar actividad: {err}")
-        conexion.rollback()
-        exito = False
-    finally:
-        cursor.close()
-        conexion.close()
-    return exito
+-- Tabla equiposDeAlquiler
+CREATE TABLE equiposDeAlquiler (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    descripcion VARCHAR(100) NOT NULL,
+    costo DECIMAL(10,2) NOT NULL,
+    id_actividad INT NOT NULL,
+    FOREIGN KEY (id_actividad) REFERENCES actividades(id)
+);
 
-def eliminar_actividad(id_actividad):
-    conexion = obtener_conexion()
-    cursor = conexion.cursor()
-    query = "DELETE FROM actividades WHERE id = %s"
-    try:
-        cursor.execute(query, (id_actividad,))
-        conexion.commit()
-        exito = True
-    except Exception as err:
-        print(f"Error al eliminar actividad: {err}")
-        conexion.rollback()
-        exito = False
-    finally:
-        cursor.close()
-        conexion.close()
-    return exito
+-- Tabla estudiantes
+CREATE TABLE estudiantes (
+    ci VARCHAR(20) PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    telefono VARCHAR(20),
+    correo_electronico VARCHAR(100)
+);
+
+-- Tabla instructores
+CREATE TABLE instructores (
+    ci VARCHAR(20) PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL
+);
+
+-- Tabla administrativos
+CREATE TABLE administrativos (
+    ci VARCHAR(20) PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL,
+    apellido VARCHAR(50) NOT NULL
+);
+
+-- Tabla turnos
+CREATE TABLE turnos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    hora_inicio TIME NOT NULL,
+    hora_fin TIME NOT NULL
+);
+
+-- Tabla clase
+CREATE TABLE clase (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ci_instructor VARCHAR(20) NOT NULL,
+    id_actividad INT NOT NULL,
+    id_turno INT NOT NULL,
+    dictada BOOLEAN DEFAULT FALSE,
+    FOREIGN KEY (ci_instructor) REFERENCES instructores(ci),
+    FOREIGN KEY (id_actividad) REFERENCES actividades(id),
+    FOREIGN KEY (id_turno) REFERENCES turnos(id),
+    CONSTRAINT instructor_unico_turno UNIQUE (ci_instructor, id_turno)
+);
+
+-- Tabla alumno_clase
+CREATE TABLE alumno_clase (
+    id_clase INT NOT NULL,
+    ci_alumno VARCHAR(20) NOT NULL,
+    id_equipamiento INT,
+    PRIMARY KEY (id_clase, ci_alumno),
+    FOREIGN KEY (id_clase) REFERENCES clase(id),
+    FOREIGN KEY (ci_alumno) REFERENCES estudiantes(ci),
+    FOREIGN KEY (id_equipamiento) REFERENCES equiposDeAlquiler(id)
+);

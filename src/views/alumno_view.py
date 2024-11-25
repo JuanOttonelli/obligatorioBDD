@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import messagebox
 from src.controllers.alumno_controller import obtener_alumnos, agregar_alumno, eliminar_alumno
 from src.models.alumno import Alumno
+from src.controllers.alumno_controller import agregar_alumno
 
 class AlumnoView:
     def __init__(self, master):
@@ -45,9 +46,13 @@ class AlumnoView:
                 messagebox.showwarning("Advertencia", "Todos los campos son obligatorios.")
                 return
             alumno = Alumno(*datos)
-            agregar_alumno(alumno)
-            messagebox.showinfo("Éxito", "Alumno agregado correctamente.")
-            ventana.destroy()
+            exito, contraseña = agregar_alumno(alumno)
+            if exito:
+                messagebox.showinfo("Éxito", f"Alumno agregado correctamente.\nContraseña generada: {contraseña}")
+                ventana.destroy()
+            else:
+                messagebox.showerror("Error", "No se pudo agregar el alumno.")
+
 
         tk.Button(ventana, text="Guardar", command=guardar_alumno).grid(row=len(labels), column=0, columnspan=2, pady=10)
 

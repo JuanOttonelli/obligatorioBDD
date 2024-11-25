@@ -1,37 +1,44 @@
 # src/controllers/login_controller.py
 
 from src.database import obtener_conexion
+from src.security import verificar_contraseña  # Lo utilizaremos más adelante
+from src.security import generar_hash_contraseña
 
 def verificar_credenciales(correo, contraseña):
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
-    query = "SELECT contraseña, tipo_persona, ci_persona FROM login WHERE correo = %s"
+    query = "SELECT contraseña_hash, tipo_persona, ci_persona FROM login WHERE correo = %s"
     cursor.execute(query, (correo,))
     resultado = cursor.fetchone()
     cursor.close()
     conexion.close()
-    if resultado and resultado['contraseña'] == contraseña:
-        return {
-            'autenticado': True,
-            'tipo_persona': resultado['tipo_persona'],
-            'ci_persona': resultado['ci_persona']
-        }
-    else:
-        return {'autenticado': False}
+
+    if resultado:
+        # Verificar la contraseña utilizando la función verificar_contraseña
+        if verificar_contraseña(contraseña, resultado['contraseña_hash']):
+            return {
+                'autenticado': True,
+                'tipo_persona': resultado['tipo_persona'],
+                'ci_persona': resultado['ci_persona']
+            }
+    # En caso de que el correo no exista o la contraseña sea incorrecta
+    return {'autenticado': False}
 
 def registrar_usuario(correo, contraseña, tipo_persona, ci_persona):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
+    # Genera el hash de la contraseña
+    contraseña_hash = generar_hash_contraseña(contraseña)
     query = """
-    INSERT INTO login (correo, contraseña, tipo_persona, ci_persona)
+    INSERT INTO login (correo, contraseña_hash, tipo_persona, ci_persona)
     VALUES (%s, %s, %s, %s)
     """
-    valores = (correo, contraseña, tipo_persona, ci_persona)
+    valores = (correo, contraseña_hash, tipo_persona, ci_persona)
     try:
         cursor.execute(query, valores)
         conexion.commit()
         exito = True
-    except conexion.Error as err:
+    except Exception as err:
         print(f"Error al registrar usuario: {err}")
         conexion.rollback()
         exito = False

@@ -2,6 +2,10 @@
 
 from src.database import obtener_conexion
 from src.models.instructor import Instructor
+from src.security import generar_hash_contraseña
+from src.controllers.password_gen import generar_contraseña_aleatoria
+import random
+import string
 
 def obtener_instructores():
     conexion = obtener_conexion()
@@ -14,26 +18,43 @@ def obtener_instructores():
     conexion.close()
     return instructores
 
+
 def agregar_instructor(instructor):
+    # Generar una contraseña aleatoria
+    contraseña = generar_contraseña_aleatoria()
+    contraseña_hash = generar_hash_contraseña(contraseña)
+
     conexion = obtener_conexion()
     cursor = conexion.cursor()
-    query = """
-    INSERT INTO instructores (ci, nombre, apellido)
-    VALUES (%s, %s, %s)
-    """
-    valores = (instructor.ci, instructor.nombre, instructor.apellido)
     try:
-        cursor.execute(query, valores)
+        # Insertar el instructor en la tabla instructores
+        query_instructor = """
+        INSERT INTO instructores (ci, nombre, apellido, correo_electronico)
+        VALUES (%s, %s, %s, %s)
+        """
+        valores_instructor = (instructor.ci, instructor.nombre, instructor.apellido, instructor.correo_electronico)
+        cursor.execute(query_instructor, valores_instructor)
+
+        # Insertar en la tabla login
+        query_login = """
+        INSERT INTO login (correo, contraseña_hash, tipo_persona, ci_persona)
+        VALUES (%s, %s, %s, %s)
+        """
+        tipo_persona = '2'
+        valores_login = (instructor.correo_electronico, contraseña_hash, tipo_persona, instructor.ci)
+        cursor.execute(query_login, valores_login)
+
         conexion.commit()
         exito = True
-    except conexion.Error as err:
+    except Exception as err:
         print(f"Error al agregar instructor: {err}")
         conexion.rollback()
         exito = False
+        contraseña = None  # No se pudo generar la contraseña
     finally:
         cursor.close()
         conexion.close()
-    return exito
+    return exito, contraseña
 
 def actualizar_instructor(instructor):
     conexion = obtener_conexion()

@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import messagebox
 from src.controllers.instructor_controller import obtener_instructores, agregar_instructor, actualizar_instructor, eliminar_instructor, obtener_agenda_instructor
 from src.models.instructor import Instructor
+from src.controllers.instructor_controller import agregar_instructor
 
 class InstructorView:
     def __init__(self, master):
@@ -34,7 +35,7 @@ class InstructorView:
         ventana = tk.Toplevel(self.master)
         ventana.title("Agregar Instructor")
 
-        labels = ["CI", "Nombre", "Apellido"]
+        labels = ["CI", "Nombre", "Apellido", "Correo Electrónico"]
         entries = []
 
         for idx, label_text in enumerate(labels):
@@ -44,22 +45,18 @@ class InstructorView:
             entries.append(entry)
 
         def guardar_instructor():
-            ci = entries[0].get()
-            nombre = entries[1].get()
-            apellido = entries[2].get()
-
-            if not ci or not nombre or not apellido:
+            datos = [entry.get() for entry in entries]
+            if "" in datos:
                 messagebox.showwarning("Advertencia", "Todos los campos son obligatorios.")
                 return
+            instructor = Instructor(*datos)
 
-            instructor = Instructor(ci=ci, nombre=nombre, apellido=apellido)
-            exito = agregar_instructor(instructor)
+            exito, contraseña = agregar_instructor(instructor)
             if exito:
-                messagebox.showinfo("Éxito", "Instructor agregado correctamente.")
+                messagebox.showinfo("Éxito", f"Instructor agregado correctamente.\nContraseña generada: {contraseña}")
                 ventana.destroy()
             else:
                 messagebox.showerror("Error", "No se pudo agregar el instructor.")
-
         tk.Button(ventana, text="Guardar", command=guardar_instructor).grid(row=len(labels), column=0, columnspan=2, pady=10)
 
     def abrir_formulario_actualizar(self):

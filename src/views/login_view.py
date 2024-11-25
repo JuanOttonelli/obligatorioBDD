@@ -23,8 +23,11 @@ class LoginView:
     def iniciar_sesion(self):
         correo = self.entry_correo.get()
         contraseña = self.entry_contraseña.get()
-        if verificar_credenciales(correo, contraseña):
+        resultado = verificar_credenciales(correo, contraseña)
+        if resultado['autenticado']:
+            # Inicio de sesión exitoso
             self.frame.destroy()
             MainMenuView(self.master)
         else:
+            # Mostrar mensaje genérico de error
             messagebox.showerror("Error", "Correo o contraseña incorrectos.")
