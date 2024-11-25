@@ -88,3 +88,19 @@ CREATE TABLE alumno_clase (
     FOREIGN KEY (ci_alumno) REFERENCES estudiantes(ci),
     FOREIGN KEY (id_equipamiento) REFERENCES equiposDeAlquiler(id)
 );
+
+INSERT INTO tiposPersonas(id, descripcion) VALUES
+    (1,"Administrativo"),
+    (2, "Instructor"),
+    (3, "Estudiante")
+    ;
+
+Insert Into login(correo, contraseña, tipo_persona, ci_persona) VALUE (
+    "juan@gmail.com","1234",3,"12345678"
+    );
+
+ALTER TABLE login CHANGE contraseña contraseña_hash VARCHAR(255) NOT NULL;
+
+UPDATE login SET contraseña_hash = '$2b$12$F6iJRTqQYFFi/6NvbG6L6O87hS7hfMILtlTtgFIAc2YXlxAWYw4Se' WHERE correo = 'juan@gmail.com';
+
+ALTER TABLE instructores ADD COLUMN correo_electronico VARCHAR(255) NOT NULL;
