@@ -58,7 +58,7 @@ class EquipoAlquilerView:
 
         tk.Label(ventana, text="Actividad:").grid(row=2, column=0, padx=5, pady=5)
         actividades = actividad_controller.obtener_actividades()
-        combo_actividades = ttk.Combobox(ventana, values=[f"{a.id} - {a.nombre}" for a in actividades])
+        combo_actividades = ttk.Combobox(ventana, values=[f"{a.id} - {a.descripcion}" for a in actividades])
         combo_actividades.grid(row=2, column=1, padx=5, pady=5)
 
         def guardar_equipo():
@@ -109,7 +109,7 @@ class EquipoAlquilerView:
 
         tk.Label(ventana, text="Actividad:").grid(row=2, column=0, padx=5, pady=5)
         actividades = actividad_controller.obtener_actividades()
-        combo_actividades = ttk.Combobox(ventana, values=[f"{a.id} - {a.nombre}" for a in actividades])
+        combo_actividades = ttk.Combobox(ventana, values=[f"{a.id} - {a.descripcion}" for a in actividades])
         combo_actividades.set(f"{valores[3]}")
         combo_actividades.grid(row=2, column=1, padx=5, pady=5)
 

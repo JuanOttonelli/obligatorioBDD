@@ -21,9 +21,9 @@ class MainMenuView:
             tk.Button(self.frame, text="Gestionar Clases", command=self.gestionar_clases, width=20).pack(pady=5)
             tk.Button(self.frame, text="Gestionar Turnos", command=self.gestionar_turnos, width=20).pack(pady=5)
             tk.Button(self.frame, text="Gestionar Equipos de Alquiler", command=self.gestionar_equipos_alquiler, width=20).pack(pady=5)  # Nueva opción
+            tk.Button(self.frame, text="Ver Reportes", command=self.ver_reportes, width=20).pack(pady=5)
         elif tipo_usuario == 2:
             tk.Button(self.frame, text="Ver Agenda", command=self.ver_agenda, width=20).pack(pady=5)
-            tk.Button(self.frame, text="Registrar Asistencia", command=self.registrar_asistencia, width=20).pack(pady=5)
         elif tipo_usuario == 3:
             tk.Button(self.frame, text="Ver Clases", command=self.ver_clases, width=20).pack(pady=5)
             tk.Button(self.frame, text="Inscribirse en Clase", command=self.inscribirse_clase, width=20).pack(pady=5)
@@ -64,13 +64,9 @@ class MainMenuView:
 
     def ver_agenda(self):
         self.frame.destroy()
-        from src.views.instructor_view import InstructorView
-        InstructorView(self.master).ver_agenda()
+        from src.views.ver_clases_instructor_view import VerClasesInstructorView
+        VerClasesInstructorView(self.master)
 
-    def registrar_asistencia(self):
-        self.frame.destroy()
-        from src.views.instructor_view import InstructorView
-        InstructorView(self.master).registrar_asistencia()
 
     def ver_clases(self):
         self.frame.destroy()
@@ -86,6 +82,11 @@ class MainMenuView:
         self.frame.destroy()
         from src.views.equipo_alquiler_view import EquipoAlquilerView
         EquipoAlquilerView(self.master)
+
+    def ver_reportes(self):
+        self.frame.destroy()
+        from src.views.reporte_view import ReporteView
+        ReporteView(self.master)
 
     def cerrar_sesion(self):
         # Limpiamos usuario_actual a través del módulo session

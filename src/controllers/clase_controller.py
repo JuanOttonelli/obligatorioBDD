@@ -108,6 +108,73 @@ def obtener_clases_disponibles(ci_alumno):
         clase.turno_descripcion = resultado['turno_descripcion']
         clases.append(clase)
     return clases
+
+def obtener_clases_inscritas_por_alumno(ci_alumno):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    query = """
+    SELECT c.*, a.descripcion AS actividad_nombre, t.descripcion AS turno_descripcion, i.nombre AS nombre_instructor, i.apellido AS apellido_instructor, t.hora_inicio, t.hora_fin
+    FROM clase c
+    JOIN alumno_clase ac ON c.id = ac.id_clase
+    JOIN actividades a ON c.id_actividad = a.id
+    JOIN turnos t ON c.id_turno = t.id
+    JOIN instructores i ON c.ci_instructor = i.ci
+    WHERE ac.ci_alumno = %s
+    """
+    cursor.execute(query, (ci_alumno,))
+    resultados = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+    clases = []
+    for resultado in resultados:
+        clase = Clase(
+            id=resultado['id'],
+            ci_instructor=resultado['ci_instructor'],
+            id_actividad=resultado['id_actividad'],
+            id_turno=resultado['id_turno'],
+            dictada=resultado['dictada']
+        )
+        # Asignar atributos adicionales
+        clase.actividad_nombre = resultado['actividad_nombre']
+        clase.turno_descripcion = resultado['turno_descripcion']
+        clase.nombre_instructor = resultado['nombre_instructor']
+        clase.apellido_instructor = resultado['apellido_instructor']
+        clase.hora_inicio = resultado['hora_inicio']
+        clase.hora_fin = resultado['hora_fin']
+        clases.append(clase)
+    return clases
+
+def obtener_clases_por_instructor(ci_instructor):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    query = """
+    SELECT c.*, a.descripcion AS actividad_nombre, t.descripcion AS turno_descripcion, t.hora_inicio, t.hora_fin
+    FROM clase c
+    JOIN actividades a ON c.id_actividad = a.id
+    JOIN turnos t ON c.id_turno = t.id
+    WHERE c.ci_instructor = %s
+    """
+    cursor.execute(query, (ci_instructor,))
+    resultados = cursor.fetchall()
+    cursor.close()
+    conexion.close()
+    clases = []
+    for resultado in resultados:
+        clase = Clase(
+            id=resultado['id'],
+            ci_instructor=resultado['ci_instructor'],
+            id_actividad=resultado['id_actividad'],
+            id_turno=resultado['id_turno'],
+            dictada=resultado['dictada']
+        )
+        # Asignar atributos adicionales
+        clase.actividad_nombre = resultado['actividad_nombre']
+        clase.turno_descripcion = resultado['turno_descripcion']
+        clase.hora_inicio = resultado['hora_inicio']
+        clase.hora_fin = resultado['hora_fin']
+        clases.append(clase)
+    return clases
+
 def agregar_clase(clase):
     conexion = obtener_conexion()
     cursor = conexion.cursor()

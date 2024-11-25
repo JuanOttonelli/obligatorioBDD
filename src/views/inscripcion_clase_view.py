@@ -10,8 +10,6 @@ from src.views.main_menu_view import MainMenuView
 class InscripcionClaseView:
     def __init__(self, master):
         self.master = master
-        #self.ventana = tk.Toplevel(self.master)
-        #self.ventana.title("Inscribirse en Clase")
         self.master.title('Inscripcion Clase')
         self.frame = tk.Frame(master)
         self.frame.pack(padx=20, pady=20)

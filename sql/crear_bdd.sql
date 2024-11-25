@@ -121,3 +121,10 @@ CREATE TABLE IF NOT EXISTS alquileres (
     FOREIGN KEY (clase_id) REFERENCES clase(id),
     FOREIGN KEY (equipo_id_alquiler) REFERENCES equiposDeAlquiler(id)
 );
+
+CREATE TABLE alumno_equipo (
+    ci_alumno VARCHAR(20) NOT NULL,
+    id_equipo INT NOT NULL,
+    FOREIGN KEY (ci_alumno) REFERENCES estudiantes(ci),
+    FOREIGN KEY (id_equipo) REFERENCES equiposDeAlquiler(id)
+);
