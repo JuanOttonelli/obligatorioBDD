@@ -44,9 +44,10 @@ cuando se te solicite.
    3. Ejecuta los archivos anteriores en DataGrip.
 
 ## C. Ejecución de la Aplicación
-1. Inicia la aplicación ejecutando con Python el siguiente archivo:
+1. Actualiza valores de user y password en src/database.py
+2. Inicia la aplicación ejecutando con Python el siguiente archivo:
 src/main.py
-2. Elige la correspondiente opción de login: alumno, administrativo o
+3. Elige la correspondiente opción de login: alumno, administrativo o
 instructor.
 
    

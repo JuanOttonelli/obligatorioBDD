@@ -1,5 +1,5 @@
 
-INSERT INTO `tipospersonas` VALUES (1,'Administrativo'),(2,'Instructor'),(3,'Estudiante');
+INSERT INTO `tiposPersonas` VALUES (1,'Administrativo'),(2,'Instructor'),(3,'Estudiante');
 
 INSERT INTO `turnos` VALUES (1,'09:00:00','11:00:00','Mañana'),(2,'12:00:00','14:00:00','Tarde'),(3,'16:00:00','18:00:00','Noche');
 
