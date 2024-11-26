@@ -5,7 +5,7 @@ import bcrypt
 def generar_hash_contraseña(contraseña):
     # Convierte la contraseña a bytes
     contraseña_bytes = contraseña.encode('utf-8')
-    # Genera una sal y hashea la contraseña
+    # Hashea la contraseña
     contraseña_hash = bcrypt.hashpw(contraseña_bytes, bcrypt.gensalt())
     # Retorna el hash como string
     return contraseña_hash.decode('utf-8')

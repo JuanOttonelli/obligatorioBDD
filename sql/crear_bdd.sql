@@ -12,7 +12,7 @@ CREATE TABLE tiposPersonas (
 -- Tabla login
 CREATE TABLE login (
     correo VARCHAR(100) PRIMARY KEY,
-    contraseña VARCHAR(255) NOT NULL,
+    contraseña_hash VARCHAR(255) NOT NULL,
     tipo_persona INT NOT NULL,
     ci_persona VARCHAR(20) NOT NULL,
     FOREIGN KEY (tipo_persona) REFERENCES tiposPersonas(id)
@@ -49,7 +49,8 @@ CREATE TABLE estudiantes (
 CREATE TABLE instructores (
     ci VARCHAR(20) PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
-    apellido VARCHAR(50) NOT NULL
+    apellido VARCHAR(50) NOT NULL,
+    correo_electronico VARCHAR(255) NOT NULL
 );
 
 -- Tabla administrativos
@@ -63,7 +64,8 @@ CREATE TABLE administrativos (
 CREATE TABLE turnos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     hora_inicio TIME NOT NULL,
-    hora_fin TIME NOT NULL
+    hora_fin TIME NOT NULL,
+    descripcion VARCHAR(255) NOT NULL
 );
 
 -- Tabla clase
@@ -90,29 +92,8 @@ CREATE TABLE alumno_clase (
     FOREIGN KEY (id_equipamiento) REFERENCES equiposDeAlquiler(id)
 );
 
-INSERT INTO tiposPersonas(id, descripcion) VALUES
-    (1,"Administrativo"),
-    (2, "Instructor"),
-    (3, "Estudiante")
-    ;
-
-Insert Into login(correo, contraseña, tipo_persona, ci_persona) VALUE (
-    "juan@gmail.com","1234",3,"12345678"
-    );
-
-ALTER TABLE login CHANGE contraseña contraseña_hash VARCHAR(255) NOT NULL;
-
-UPDATE login SET contraseña_hash = '$2b$12$F6iJRTqQYFFi/6NvbG6L6O87hS7hfMILtlTtgFIAc2YXlxAWYw4Se' WHERE correo = 'juan@gmail.com';
-
-ALTER TABLE instructores ADD COLUMN correo_electronico VARCHAR(255) NOT NULL;
-
-Insert Into login(correo, contraseña_hash, tipo_persona, ci_persona) VALUE (
-    "admin@admin.com","$2b$12$yzGGvmmB4H56y/iY9.Kg4.6yP0hVKe7nn9ajvtqnV1acUBY.vjOs6",1,"99999999"
-    );
-
-ALTER TABLE turnos ADD COLUMN descripcion VARCHAR(255) NOT NULL;
-
-CREATE TABLE IF NOT EXISTS alquileres (
+-- Tabla alquileres
+CREATE TABLE alquileres (
     id INT AUTO_INCREMENT PRIMARY KEY,
     alumno_ci VARCHAR(20) NOT NULL,
     clase_id INT NOT NULL,
@@ -122,9 +103,12 @@ CREATE TABLE IF NOT EXISTS alquileres (
     FOREIGN KEY (equipo_id_alquiler) REFERENCES equiposDeAlquiler(id)
 );
 
-CREATE TABLE alumno_equipo (
-    ci_alumno VARCHAR(20) NOT NULL,
-    id_equipo INT NOT NULL,
-    FOREIGN KEY (ci_alumno) REFERENCES estudiantes(ci),
-    FOREIGN KEY (id_equipo) REFERENCES equiposDeAlquiler(id)
-);
+
+
+
+
+
+
+
+
+
