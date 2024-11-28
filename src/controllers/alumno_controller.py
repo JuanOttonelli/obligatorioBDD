@@ -1,9 +1,13 @@
 # src/controllers/alumno_controller.py
+from src.controllers.password_gen import generar_contraseña_aleatoria
 from src.database import obtener_conexion
 from src.models.alumno import Alumno
 import random
 import string
 import hashlib
+
+from src.security import generar_hash_contraseña
+
 
 def obtener_alumnos():
     conexion = obtener_conexion()
@@ -30,9 +34,8 @@ def agregar_alumno(alumno):
     conexion = obtener_conexion()
     cursor = conexion.cursor()
     # Generar una contraseña aleatoria
-    contraseña = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-    # Hashear la contraseña
-    contraseña_hash = hashlib.sha256(contraseña.encode('utf-8')).hexdigest()
+    contraseña = generar_contraseña_aleatoria()
+    contraseña_hash = generar_hash_contraseña(contraseña)
     try:
         # Insertar en la tabla 'estudiantes'
         query_estudiante = """
