@@ -5,8 +5,8 @@ import mysql.connector
 def obtener_conexion():
     conexion = mysql.connector.connect(
         host='127.0.0.1',
-        user='root',
-        password='rootpassword',
+        user='', #Ingresar usuario propio
+        password='', #Ingresar contraseña propia
         database='escuela_deportes_nieve'
     )
     return conexion
